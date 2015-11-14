@@ -1,0 +1,52 @@
+#
+# Imakefile
+#  
+
+TARGET1  = b2dds.so
+OBJS1  = b2dds.o UserInfo.o geninfo.o ksfwmoments.o
+
+BUILD_TOP_DIR    = $(BELLE_RUN_DIR)
+RELATIVE_TOP_DIR = $(BELLE_TOP_DIR)
+BELLE_INC_DIR    = $(BELLE_TOP_DIR)/include
+BBSTABLE         = $(BELLE_TOP_DIR)/src/config/panther/bbstable
+
+include $(BELLE_TOP_DIR)/src/config/Makefile.panther
+
+BELLE_LIB = -lcabs3 -lip -lkid -lmdst -lparticle -lhelix -lbenergy -lhamlet -ltagv -lbelleCLHEP  -lip -lexkfitter
+PANTHER_LIB = -L$(BELLE_RUN_DIR)/lib/so -lpanther
+.SUFFIXES: .c .cc .so
+
+LIBS = -L. $(PANTHER_LIB) $(BELLE_LIB) $(EXTRA_LIB) `root-config --libs`\
+       -L$(MY_RUN_DIR)/lib/so -L$(BELLE_RUN_DIR)/lib -L$(CENR_ROOT)/lib -lip -L$(BELLE RUN DIR)/lib/so -lnisKsFinder 
+INCS = -I. -I$(BELLE_INC_DIR) `root-config --cflags` -I$(NEUROBAYES)/include
+
+CC  = gcc
+CXX = g++
+OPT = -g
+CFLAGS   = $(OPT) -DHEP_SHORT_NAMES -DBELLE_SHORT_NAMES -DDSTXX_NOINLINE -fPIC
+CXXFLAGS = $(OPT) -DHEP_SHORT_NAMES -DBELLE_SHORT_NAMES -DDSTXX_NOINLINE -fPIC
+SOFLAGS  = $(OPT) -shared -Wl,-export-dynamic
+
+.cc.o:
+	$(CXX) -c $(CXXFLAGS) $(INCS) -o $@ $<
+
+.c.o:
+	$(CXX) -c $(CFLAGS) $(INCS) -o $@ $<
+
+# ------------------------------------------------------------------------
+
+all:: $(TARGET1)
+
+$(TARGET1): $(OBJS1)
+	$(CXX) $(SOFLAGS) -o $@ $(OBJS1) $(LIBS)
+
+
+UserInfo.o: UserInfo.cc UserInfo.h
+	$(CXX) -c -O4 $(CXXFLAGS) $(INCS) -o $@ $<
+
+geninfo.o: geninfo.cc geninfo.h
+	$(CXX) -c -04 $(CXXFLAGS) $(INCS) -o $@ $<
+
+ksfwmoments.o: ../B0toDh0/rooksfw/ksfwmoments.cc ../B0toDh0/rooksfw/ksfwmoments.h
+	$(CXX) -c -04 $(CXXFLAGS) $(INCS) -o $@ $<
+
